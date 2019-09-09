@@ -1,4 +1,4 @@
-*2Jc[MFh,zXXn)Lguse progresstracker_v6;
+use progresstracker_v6;
 
 -- 1:
 -- Birtið lista af öllum áföngum sem geymdir eru í gagnagrunninum.
