@@ -203,7 +203,9 @@ begin
 end $$
 delimiter ;
 
-select courseNumber from restrictors full join courses on restrictors.courseNumber = courses.courseNumber;
+select courses.courseNumber, restrictorID 
+from restrictors 
+left outer join courses on restrictors.courseNumber = courses.courseNumber;
 
 
 -- 15:
@@ -214,6 +216,6 @@ drop procedure if exists RestrictorList $$
 
 create procedure RestrictorList()
 begin
-	-- kóði hér...
+	select * from restrictors;
 end $$
 delimiter ;
