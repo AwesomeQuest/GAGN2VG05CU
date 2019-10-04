@@ -52,23 +52,23 @@ delimiter ;
 delimiter $$
 drop procedure if exists CourseList $$
 
-create procedure CountThings(@StudentID)
+create procedure CountThings(SID int)
 begin
 	select concat(firstName, " ", lastName) as name
     from students 
-    where studentID = @StudentID
+    where studentID = SID
     
     union all
     
     select trackID as track
     from registration
-    where studentID = @studentID
+    where studentID = SID
     
     union all
     
     select count(courseNumber) as "Number of Courses"
     from registration
-    where studentID = @studentID;
+    where studentID = SID;
     
 end $$
 delimiter ;
@@ -91,13 +91,13 @@ delimiter ;
 delimiter $$
 drop procedure if exists CourseList $$
 
-create procedure AddStudent(@firstName, @lastName, @dob, @startSemester, @trackID)
+create procedure AddStudent(fName varchar(55), lName varchar(55), DateOB date, startSem int, TID int)
 begin
-	insert into Students(firstName,lastName,dob,startSemester)values(@firstName, @lastName, @dob, @startSemester);
+	insert into Students(firstName,lastName,dob,startSemester)values(fName, lName, DateOB, startSem);
     
-    @studentID = select *from students ORDER BY id DESC LIMIT 1;
+    SID = select *from students ORDER BY id DESC LIMIT 1;
     
-    AddMandatoryCourses(@studentID, @trackID)
+    AddMandatoryCourses(SID, TID)
 end $$
 delimiter ;
 
@@ -105,20 +105,20 @@ delimiter ;
 delimiter $$
 drop procedure if exists CourseList $$
 
-create procedure AddMandatoryCourses(@studentID, @trackID)
+create procedure AddMandatoryCourses(SID int, TID int)
 begin
 
 	@counter = 0;
 
 	while (select count(trackID) 
     from trackcourses 
-    where mandatory && trackID == @trackID) >= counter
+    where mandatory && trackID == TID) >= counter
 	begin
 		insert into Registration
 		(studentID,trackID,courseNumber,registrationDate,passed,semesterID)
 		values
-        (@studentID, 
-		@trackID, 
+        (SID, 
+		TID, 
 			(select courseNumber
 			from trackID
             order by courseNumber limit counter, 1),
@@ -137,16 +137,16 @@ delimiter ;
 delimiter $$
 drop procedure if exists CourseList $$
 
-create procedure StudentRegistration(@studentID, @trackID, @courseNumber, SemesterID)
+create procedure StudentRegistration(SID int, TID int, courseNum char(10), semID int)
 begin
 		insert into Registration
 		(studentID,trackID,courseNumber,registrationDate,passed,semesterID)
 		values
-        (@studentID,
-		@trackID,
-		@courseNumber,
+        (SID,
+		TID,
+		courseNum,
 		GETDATE(),
         false,
-		@semesterID);
+		semID);
 end $$
 delimiter ;
