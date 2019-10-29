@@ -13,7 +13,7 @@ for each row
 begin
 	declare msg varchar(255);
     
-    if(new.courseNumber == new restrictorID) then
+    if(new.courseNumber = new.restrictorID) then
 		set msg = concat('Courses cannot restrict them selves', cast(new.courseNumber as char));
         signal sqlstate '45000' set message_text = msg;
 	end if;
@@ -32,10 +32,10 @@ for each row
 begin
 	declare msg varchar(255);
     
-    if(new.courseNumber == new restrictorID) then
+    if(new.courseNumber = new.restrictorID) then
 		set msg = concat('Courses cannot restrict them selves', cast(new.courseNumber as char));
         signal sqlstate '45000' set message_text = msg;
-	end;
+	end if;
 end$$
 delimiter ;
 
@@ -95,9 +95,9 @@ create procedure AddStudent(fName varchar(55), lName varchar(55), DateOB date, s
 begin
 	insert into Students(firstName,lastName,dob,startSemester)values(fName, lName, DateOB, startSem);
     
-    SID = select *from students ORDER BY id DESC LIMIT 1;
+    set @SID = (select *from students ORDER BY id DESC LIMIT 1);
     
-    AddMandatoryCourses(SID, TID)
+    call AddMandatoryCourses(SID, TID);
 end $$
 delimiter ;
 
@@ -108,12 +108,12 @@ drop procedure if exists CourseList $$
 create procedure AddMandatoryCourses(SID int, TID int)
 begin
 
-	@counter = 0;
+	set @counter = 0;
 
 	while (select count(trackID) 
     from trackcourses 
-    where mandatory && trackID == TID) >= counter
-	begin
+    where mandatory && trackID = TID) >= counter
+	do
 		insert into Registration
 		(studentID,trackID,courseNumber,registrationDate,passed,semesterID)
 		values
@@ -128,6 +128,7 @@ begin
 			from trackID
             order by courseNumber limit counter, 1)
         );
+	end while;
 		
 
 end $$
