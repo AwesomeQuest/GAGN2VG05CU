@@ -128,6 +128,7 @@ begin
 			from trackID
             order by courseNumber limit counter, 1)
         );
+		set counter = counter + 1;
 	end while;
 		
 
